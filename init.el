@@ -1,12 +1,12 @@
 (setq
- ;; package-user-dir "/tmp/foo"
+ package-user-dir "/tmp/new"
  inhibit-splash-screen t
  package-selected-packages
  '(lsp-mode
    ;; optional, needed for snippets
    yasnippet
    ;; usability (optional)
-   lsp-treemacs company-posframe  helm-lsp  ;; or lsp-ivy
+   lsp-treemacs company-posframe helm-lsp  ;; or lsp-ivy
    ;; external lsp clients (optional)
    lsp-dart lsp-java lsp-python-ms lsp-metals
    ;; helper packages
@@ -16,15 +16,30 @@
    ;; beautifiers (optional)
    diminish helm-icons ;; lsp-ui
    ;; optional debugger
-   dap-mode))
+   dap-mode quelpa gruvbox-theme))
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
+(setq company-tooltip-margin 2)
+
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
   (package-refresh-contents)
+
+  (package-install 'quelpa)
+  (mapc #'quelpa '((company :fetcher github
+                            :repo "yyoncho/company-mode"
+                            :branch "icons"
+                            :files ("*.el" "icons"))
+                   (lsp-mode :fetcher github
+                             :repo "yyoncho/lsp-mode"
+                             :branch "icons-company"
+                             :files ("*.el"))))
+
   (mapc #'package-install package-selected-packages))
+
+(load-theme 'gruvbox t)
 
 ;; helm configuration
 (helm-icons-enable)
@@ -55,11 +70,10 @@
       company-frontends '(company-pseudo-tooltip-frontend)
       lsp-completion-show-detail nil
       lsp-completion-show-kind nil
-
       ;; resposibility
       company-idle-delay 0.0
       company-minimum-prefix-length 1
-
+      lsp-idle-delay 0.1
       ;; more context
       lsp-headerline-breadcrumb-enable t)
 
